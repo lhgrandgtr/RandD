@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Car Navigation System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .video-container {
+            flex: 1;
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .thoughts-container {
+            flex: 1;
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        #videoFeed {
+            width: 100%;
+            border-radius: 4px;
+        }
+        .thought-entry {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            border-left: 3px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="video-container">
+            <h2>Video Feed</h2>
+            <img id="videoFeed" src="" alt="Video feed">
+        </div>
+        <div class="thoughts-container">
+            <h2>Agent Thoughts</h2>
+            <div id="thoughtsList"></div>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        const videoFeed = document.getElementById('videoFeed');
+        const thoughtsList = document.getElementById('thoughtsList');
+        
+        // Handle video feed updates
+        const videoSource = new EventSource('/video_feed');
+        videoSource.onmessage = function(event) {
+            videoFeed.src = event.data;
+        };
+
+        // Handle agent thoughts updates
+        socket.on('thought', function(data) {
+            const thoughtEntry = document.createElement('div');
+            thoughtEntry.className = 'thought-entry';
+            thoughtEntry.textContent = data.data;
+            thoughtsList.insertBefore(thoughtEntry, thoughtsList.firstChild);
+        });
+    </script>
+</body>
+</html>
